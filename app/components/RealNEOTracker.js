@@ -199,7 +199,7 @@ export default function RealNEOTracker() {
                                                 {danger.level}
                                             </span>
                                             {neo.is_potentially_hazardous_asteroid && (
-                                                <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                                                <AlertTriangle className="w-4 h-4 text-red-400 flex-0" />
                                             )}
                                         </div>
                                     </div>

@@ -33,7 +33,7 @@ export default function SimpleAPOD() {
                 Astronomy Picture of the Day
             </h3>
 
-            <div className="aspect-video bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-lg mb-4 flex items-center justify-center">
+            <div className="aspect-video bg-linear-to-br from-purple-900/50 to-blue-900/50 rounded-lg mb-4 flex items-center justify-center">
                 <div className="text-center">
                     <Camera className="w-12 h-12 text-white/50 mx-auto mb-2" />
                     <p className="text-white/70">NASA APOD Image</p>

@@ -64,7 +64,7 @@ export default function EnhancedDashboard() {
                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                         </div>
                         <div>
-                            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            <h1 className="text-4xl font-bold bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                                 NASA Mission Control
                             </h1>
                             <p className="text-gray-300 text-lg">
@@ -100,7 +100,7 @@ export default function EnhancedDashboard() {
                                 onClick={() => setActiveSection(section.id)}
                                 className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 ${
                                     activeSection === section.id
-                                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 scale-105"
+                                        ? "bg-linear-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 scale-105"
                                         : "bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white"
                                 }`}
                             >
@@ -227,7 +227,7 @@ export default function EnhancedDashboard() {
                                     <Camera className="w-6 h-6 text-blue-400" />
                                     Daily Space Image
                                 </h3>
-                                <div className="aspect-video bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-lg flex items-center justify-center mb-3">
+                                <div className="aspect-video bg-linear-to-br from-blue-900/30 to-purple-900/30 rounded-lg flex items-center justify-center mb-3">
                                     <div className="text-center">
                                         <Camera className="w-8 h-8 text-white/50 mx-auto mb-2" />
                                         <p className="text-white/70 text-sm">
@@ -253,7 +253,7 @@ export default function EnhancedDashboard() {
                             <Globe className="w-6 h-6 text-blue-400" />
                             Earth from Space
                         </h3>
-                        <div className="aspect-video bg-gradient-to-br from-blue-900/30 to-green-900/30 rounded-lg flex items-center justify-center">
+                        <div className="aspect-video bg-linear-to-br from-blue-900/30 to-green-900/30 rounded-lg flex items-center justify-center">
                             <div className="text-center">
                                 <Globe className="w-16 h-16 text-white/50 mx-auto mb-4 animate-pulse" />
                                 <p className="text-white text-lg">
