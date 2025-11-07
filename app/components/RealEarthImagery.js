@@ -22,25 +22,52 @@ const RealEarthImagery = () => {
     const [imageLoading, setImageLoading] = useState(false);
 
     const generateFallbackData = useCallback(() => {
-        // Generate sample data when API is unavailable
+        // Enhanced fallback with diverse Earth imagery sources
         const sampleImages = [
             {
-                image: "epic_earth_001",
+                image: "earth_americas",
                 date: new Date().toISOString(),
-                caption: "Earth from DSCOVR satellite",
+                caption: "Western Hemisphere - Americas visible",
                 imageUrl:
-                    "https://epic.gsfc.nasa.gov/epic-galleries/2023/lunar_transit/thumbs/epic_1b_20230222173135.jpg",
+                    "https://www.nasa.gov/sites/default/files/thumbnails/image/iss068e040394.jpg",
                 displayTime: new Date().toLocaleString(),
-                coordinates: { lat: 0, lon: 0 },
+                coordinates: { lat: 0, lon: -75 },
             },
             {
-                image: "epic_earth_002",
+                image: "earth_africa_europe",
                 date: new Date(Date.now() - 3600000).toISOString(),
-                caption: "Pacific Ocean view from space",
+                caption: "Eastern Hemisphere - Africa and Europe",
                 imageUrl:
-                    "https://epic.gsfc.nasa.gov/epic-galleries/2023/eclipse/thumbs/epic_1b_20231014153201.jpg",
+                    "https://www.nasa.gov/sites/default/files/thumbnails/image/iss068e013391.jpg",
                 displayTime: new Date(Date.now() - 3600000).toLocaleString(),
-                coordinates: { lat: 15, lon: -120 },
+                coordinates: { lat: 20, lon: 15 },
+            },
+            {
+                image: "earth_pacific",
+                date: new Date(Date.now() - 7200000).toISOString(),
+                caption: "Pacific Ocean and Asia view",
+                imageUrl:
+                    "https://www.nasa.gov/sites/default/files/thumbnails/image/iss068e019063.jpg",
+                displayTime: new Date(Date.now() - 7200000).toLocaleString(),
+                coordinates: { lat: 10, lon: 140 },
+            },
+            {
+                image: "earth_night_lights",
+                date: new Date(Date.now() - 10800000).toISOString(),
+                caption: "Earth's city lights at night",
+                imageUrl:
+                    "https://www.nasa.gov/sites/default/files/thumbnails/image/iss067e355861.jpg",
+                displayTime: new Date(Date.now() - 10800000).toLocaleString(),
+                coordinates: { lat: 30, lon: 0 },
+            },
+            {
+                image: "earth_aurora",
+                date: new Date(Date.now() - 14400000).toISOString(),
+                caption: "Aurora borealis over Earth's curvature",
+                imageUrl:
+                    "https://www.nasa.gov/sites/default/files/thumbnails/image/iss068e022542.jpg",
+                displayTime: new Date(Date.now() - 14400000).toLocaleString(),
+                coordinates: { lat: 65, lon: -100 },
             },
         ];
 
@@ -61,9 +88,25 @@ const RealEarthImagery = () => {
             );
 
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: Failed to fetch Earth imagery`
-                );
+                // Handle specific HTTP status codes with informative messages
+                let errorMessage;
+                switch (response.status) {
+                    case 503:
+                        errorMessage =
+                            "EPIC API temporarily unavailable - using sample imagery";
+                        break;
+                    case 429:
+                        errorMessage =
+                            "Rate limit exceeded - switching to demo mode";
+                        break;
+                    case 500:
+                        errorMessage =
+                            "NASA server error - displaying fallback images";
+                        break;
+                    default:
+                        errorMessage = `EPIC API error (${response.status}) - using backup imagery`;
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
@@ -86,14 +129,17 @@ const RealEarthImagery = () => {
                 setCurrentImage(processedImages[0]);
                 setImageIndex(0);
                 setLastUpdated(new Date());
+                setError(null); // Clear any previous errors
             } else {
-                throw new Error("No imagery data available");
+                throw new Error(
+                    "No current EPIC imagery available - showing archived images"
+                );
             }
         } catch (err) {
-            console.error("Error fetching EPIC data:", err);
+            console.warn("EPIC API unavailable:", err.message);
             setError(err.message);
 
-            // Generate fallback data
+            // Generate enhanced fallback data with better imagery
             setTimeout(() => generateFallbackData(), 0);
         } finally {
             setLoading(false);
@@ -190,11 +236,14 @@ const RealEarthImagery = () => {
             </div>
 
             {error && (
-                <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-2 mb-4">
+                <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-3 mb-4">
                     <div className="flex items-center gap-2 text-blue-300 text-sm">
                         <ImageIcon className="w-4 h-4" />
-                        Using sample imagery - EPIC API may be temporarily
-                        unavailable
+                        <span>{error}</span>
+                    </div>
+                    <div className="mt-1 text-xs text-blue-200/70">
+                        Displaying curated Earth imagery from NASA&apos;s image
+                        gallery
                     </div>
                 </div>
             )}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Camera, Calendar, ExternalLink, Loader } from "lucide-react";
 import Image from "next/image";
+import { dashboardConfig } from "../config/dashboard";
 
 export default function RealAPOD() {
     const [apod, setApod] = useState(null);
@@ -18,20 +19,50 @@ export default function RealAPOD() {
             setLoading(true);
             setError(null);
 
-            // Using NASA's public DEMO_KEY (rate limited)
+            // Using your personal NASA API key for higher rate limits
             const response = await fetch(
-                "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY"
+                `${dashboardConfig.apis.nasa.endpoints.apod}?api_key=${dashboardConfig.apis.nasa.apiKey}`
             );
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                // Handle specific HTTP status codes with user-friendly messages
+                let errorMessage;
+                switch (response.status) {
+                    case 429:
+                        errorMessage = "Rate limit exceeded - switching to demo image";
+                        break;
+                    case 503:
+                        errorMessage = "NASA APOD API temporarily unavailable";
+                        break;
+                    case 500:
+                        errorMessage = "NASA server error - displaying sample image";
+                        break;
+                    default:
+                        errorMessage = `NASA API error (${response.status}) - using fallback image`;
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
             setApod(data);
+            setError(null); // Clear any previous errors
         } catch (err) {
-            console.error("Error fetching APOD:", err);
-            setError(`Failed to load NASA data: ${err.message}`);
+            console.warn("APOD API unavailable:", err.message);
+            setError(err.message);
+            
+            // Generate fallback APOD data with sample space imagery
+            const fallbackAPOD = {
+                title: "Eagle Nebula Pillars of Creation (Sample)",
+                explanation: "This stunning image shows the famous Pillars of Creation in the Eagle Nebula, captured by the Hubble Space Telescope. These towering columns of gas and dust are stellar nurseries where new stars are born. This is sample imagery displayed while the NASA APOD API is temporarily unavailable.",
+                url: "https://www.nasa.gov/sites/default/files/thumbnails/image/hubble_birthstars_std_0.jpg",
+                hdurl: "https://www.nasa.gov/sites/default/files/images/hubble_birthstars_hd.jpg",
+                media_type: "image",
+                date: new Date().toISOString().split('T')[0],
+                copyright: "NASA/ESA/Hubble Space Telescope",
+                service_version: "v1"
+            };
+            
+            setApod(fallbackAPOD);
         } finally {
             setLoading(false);
         }
@@ -56,22 +87,22 @@ export default function RealAPOD() {
         );
     }
 
-    if (error) {
+    if (error && !apod) {
         return (
             <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 border border-white/10">
                 <div className="flex items-center gap-3 mb-4">
-                    <Camera className="w-6 h-6 text-red-400" />
+                    <Camera className="w-6 h-6 text-orange-400" />
                     <h3 className="text-xl font-semibold text-white">
                         Astronomy Picture of the Day
                     </h3>
                 </div>
-                <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
-                    <p className="text-red-300">{error}</p>
+                <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-4">
+                    <p className="text-orange-300">{error}</p>
                     <button
                         onClick={fetchAPOD}
-                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+                        className="mt-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded transition-colors"
                     >
-                        Retry
+                        Try NASA API Again
                     </button>
                 </div>
             </div>
@@ -80,6 +111,15 @@ export default function RealAPOD() {
 
     return (
         <div className="bg-black/30 backdrop-blur-md rounded-xl overflow-hidden border border-white/10">
+            {/* API Warning Banner */}
+            {error && apod && (
+                <div className="bg-amber-500/20 border-b border-amber-500/30 p-4">
+                    <p className="text-amber-300 text-sm">
+                        ⚠️ Showing fallback content - NASA API: {error}
+                    </p>
+                </div>
+            )}
+            
             {/* Header */}
             <div className="p-6 pb-0">
                 <div className="flex items-center justify-between mb-4">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AlertTriangle, Target, Zap, Loader } from "lucide-react";
+import { dashboardConfig } from "../config/dashboard";
 
 export default function RealNEOTracker() {
     const [neoData, setNeoData] = useState(null);
@@ -19,11 +20,27 @@ export default function RealNEOTracker() {
 
             const today = new Date().toISOString().split("T")[0];
             const response = await fetch(
-                `https://api.nasa.gov/neo/rest/v1/feed?start_date=${today}&end_date=${today}&api_key=DEMO_KEY`
+                `${dashboardConfig.apis.nasa.endpoints.neo}?start_date=${today}&end_date=${today}&api_key=${dashboardConfig.apis.nasa.apiKey}`
             );
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                // Handle specific HTTP status codes with user-friendly messages
+                let errorMessage;
+                switch (response.status) {
+                    case 429:
+                        errorMessage =
+                            "Rate limit exceeded - switching to demo mode";
+                        break;
+                    case 503:
+                        errorMessage = "NASA NEO API temporarily unavailable";
+                        break;
+                    case 500:
+                        errorMessage = "NASA server error - using sample data";
+                        break;
+                    default:
+                        errorMessage = `NASA API error (${response.status}) - displaying sample asteroids`;
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
@@ -45,9 +62,86 @@ export default function RealNEOTracker() {
                 objects: sortedNEOs.slice(0, 5), // Show top 5
                 totalCount: data.element_count,
             });
+            setError(null); // Clear any previous errors
         } catch (err) {
-            console.error("Error fetching NEO data:", err);
-            setError(`Failed to load asteroid data: ${err.message}`);
+            console.warn("NEO API unavailable:", err.message);
+            setError(err.message);
+
+            // Generate realistic fallback asteroid data
+            const sampleAsteroids = [
+                {
+                    id: "sample_001",
+                    name: "2024 AB1 (Sample)",
+                    is_potentially_hazardous_asteroid: false,
+                    estimated_diameter: {
+                        kilometers: {
+                            estimated_diameter_min: 0.045,
+                            estimated_diameter_max: 0.101,
+                        },
+                    },
+                    close_approach_data: [
+                        {
+                            miss_distance: { kilometers: "1892456.789" },
+                            relative_velocity: {
+                                kilometers_per_second: "18.24",
+                            },
+                            close_approach_date: new Date()
+                                .toISOString()
+                                .split("T")[0],
+                        },
+                    ],
+                },
+                {
+                    id: "sample_002",
+                    name: "2024 CD2 (Sample)",
+                    is_potentially_hazardous_asteroid: false,
+                    estimated_diameter: {
+                        kilometers: {
+                            estimated_diameter_min: 0.023,
+                            estimated_diameter_max: 0.052,
+                        },
+                    },
+                    close_approach_data: [
+                        {
+                            miss_distance: { kilometers: "3456789.123" },
+                            relative_velocity: {
+                                kilometers_per_second: "12.67",
+                            },
+                            close_approach_date: new Date()
+                                .toISOString()
+                                .split("T")[0],
+                        },
+                    ],
+                },
+                {
+                    id: "sample_003",
+                    name: "2024 EF3 (Sample)",
+                    is_potentially_hazardous_asteroid: true,
+                    estimated_diameter: {
+                        kilometers: {
+                            estimated_diameter_min: 0.156,
+                            estimated_diameter_max: 0.349,
+                        },
+                    },
+                    close_approach_data: [
+                        {
+                            miss_distance: { kilometers: "7891234.567" },
+                            relative_velocity: {
+                                kilometers_per_second: "22.89",
+                            },
+                            close_approach_date: new Date()
+                                .toISOString()
+                                .split("T")[0],
+                        },
+                    ],
+                },
+            ];
+
+            setNeoData({
+                count: sampleAsteroids.length,
+                objects: sampleAsteroids,
+                totalCount: 8, // Sample total
+            });
         } finally {
             setLoading(false);
         }
@@ -106,20 +200,153 @@ export default function RealNEOTracker() {
         return (
             <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 border border-white/10">
                 <div className="flex items-center gap-3 mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-400" />
+                    <AlertTriangle className="w-6 h-6 text-orange-400" />
                     <h3 className="text-xl font-semibold text-white">
                         Near-Earth Objects Today
                     </h3>
                 </div>
-                <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
-                    <p className="text-red-300">{error}</p>
-                    <button
-                        onClick={fetchNEOData}
-                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
-                    >
-                        Retry
-                    </button>
+                <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-4 mb-4">
+                    <div className="flex items-center gap-2 text-orange-300 text-sm">
+                        <Target className="w-4 h-4" />
+                        <span>{error}</span>
+                    </div>
+                    <div className="mt-2 text-xs text-orange-200/70">
+                        Displaying sample asteroid data while NASA API recovers
+                    </div>
                 </div>
+                {neoData && (
+                    <div className="space-y-4">
+                        {/* Sample data display */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div className="bg-white/5 rounded-lg p-4">
+                                <div className="text-2xl font-bold text-orange-400">
+                                    {neoData.count}
+                                </div>
+                                <div className="text-sm text-gray-400">
+                                    Objects today (sample)
+                                </div>
+                            </div>
+                            <div className="bg-white/5 rounded-lg p-4">
+                                <div className="text-2xl font-bold text-red-400">
+                                    {
+                                        neoData.objects.filter(
+                                            (obj) =>
+                                                obj.is_potentially_hazardous_asteroid
+                                        ).length
+                                    }
+                                </div>
+                                <div className="text-sm text-gray-400">
+                                    Potentially hazardous
+                                </div>
+                            </div>
+                            <div className="bg-white/5 rounded-lg p-4">
+                                <div className="text-2xl font-bold text-blue-400">
+                                    {neoData.totalCount}
+                                </div>
+                                <div className="text-sm text-gray-400">
+                                    This week (estimate)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            <h4 className="text-lg font-semibold text-white">
+                                Closest Approaches (Sample Data)
+                            </h4>
+                            {neoData.objects.map((neo) => (
+                                <div
+                                    key={neo.id}
+                                    className="bg-white/10 rounded-lg p-4"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <h5 className="text-white font-medium">
+                                                    {neo.name}
+                                                </h5>
+                                                {neo.is_potentially_hazardous_asteroid && (
+                                                    <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded">
+                                                        Potentially Hazardous
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <div>
+                                                    <span className="text-gray-400">
+                                                        Miss Distance:
+                                                    </span>
+                                                    <div className="text-blue-300 font-mono">
+                                                        {formatDistance(
+                                                            neo
+                                                                .close_approach_data[0]
+                                                                .miss_distance
+                                                                .kilometers
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-gray-400">
+                                                        Velocity:
+                                                    </span>
+                                                    <div className="text-green-300 font-mono">
+                                                        {parseFloat(
+                                                            neo
+                                                                .close_approach_data[0]
+                                                                .relative_velocity
+                                                                .kilometers_per_second
+                                                        ).toFixed(2)}{" "}
+                                                        km/s
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-gray-400">
+                                                        Size:
+                                                    </span>
+                                                    <div className="text-purple-300 font-mono">
+                                                        {(
+                                                            neo
+                                                                .estimated_diameter
+                                                                .kilometers
+                                                                .estimated_diameter_min *
+                                                            1000
+                                                        ).toFixed(0)}
+                                                        -
+                                                        {(
+                                                            neo
+                                                                .estimated_diameter
+                                                                .kilometers
+                                                                .estimated_diameter_max *
+                                                            1000
+                                                        ).toFixed(0)}
+                                                        m
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-gray-400">
+                                                        Date:
+                                                    </span>
+                                                    <div className="text-yellow-300 font-mono">
+                                                        {
+                                                            neo
+                                                                .close_approach_data[0]
+                                                                .close_approach_date
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                <button
+                    onClick={fetchNEOData}
+                    className="mt-4 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded transition-colors"
+                >
+                    Try NASA API Again
+                </button>
             </div>
         );
     }
