@@ -11,12 +11,14 @@ import {
     Calendar,
     Globe,
     Zap,
+    Satellite,
+    Telescope,
 } from "lucide-react";
-import RealAPOD from "./RealAPOD";
 import RealNEOTracker from "./RealNEOTracker";
 import SimpleMarsWeather from "./SimpleMarsWeather";
 import RealSolarFlareMonitor from "./RealSolarFlareMonitor";
-import RealEarthImagery from "./RealEarthImagery";
+import ISSTracker from "./ISSTracker";
+import ExoplanetDiscovery from "./ExoplanetDiscovery";
 
 export default function EnhancedDashboard() {
     const [currentTime, setCurrentTime] = useState(new Date());
@@ -51,9 +53,9 @@ export default function EnhancedDashboard() {
     const sections = [
         { id: "overview", label: "Mission Control", icon: Star },
         { id: "asteroids", label: "Asteroid Watch", icon: AlertTriangle },
-        { id: "apod", label: "Daily Image", icon: Camera },
+        { id: "iss", label: "ISS Tracker", icon: Satellite },
         { id: "mars", label: "Mars Weather", icon: Sun },
-        { id: "earth", label: "Earth View", icon: Globe },
+        { id: "exoplanets", label: "Exoplanets", icon: Telescope },
         { id: "solar", label: "Space Weather", icon: Activity },
     ];
 
@@ -197,32 +199,33 @@ export default function EnhancedDashboard() {
                         <div className="grid grid-cols-2 gap-3 flex-1 overflow-hidden">
                             <div className="bg-black/40 backdrop-blur-md rounded-lg p-4 border border-white/20 h-full flex flex-col">
                                 <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                                    <AlertTriangle className="w-5 h-5 text-orange-400" />
-                                    Asteroid Watch
+                                    <Satellite className="w-5 h-5 text-blue-400" />
+                                    ISS Live Tracker
                                 </h3>
                                 <div className="space-y-2 flex-1">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-400">
-                                            Near-Earth Objects:
+                                            Current Crew:
                                         </span>
-                                        <span className="text-orange-400 font-semibold">
-                                            Loading...
+                                        <span className="text-blue-400 font-semibold">
+                                            7 Astronauts
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-400">
-                                            Potentially Hazardous:
+                                            Orbital Speed:
                                         </span>
-                                        <span className="text-red-400 font-semibold">
-                                            Monitoring
+                                        <span className="text-green-400 font-semibold">
+                                            27,600 km/h
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-400">
                                             Status:
                                         </span>
-                                        <span className="text-green-400 font-semibold">
-                                            All Clear
+                                        <span className="text-green-400 font-semibold flex items-center gap-1">
+                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                            Live Tracking
                                         </span>
                                     </div>
                                 </div>
@@ -230,20 +233,35 @@ export default function EnhancedDashboard() {
 
                             <div className="bg-black/40 backdrop-blur-md rounded-lg p-4 border border-white/20 h-full flex flex-col">
                                 <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                                    <Camera className="w-5 h-5 text-blue-400" />
-                                    Daily Space Image
+                                    <Telescope className="w-5 h-5 text-purple-400" />
+                                    Exoplanet Discoveries
                                 </h3>
-                                <div className="flex-1 bg-linear-to-br from-blue-900/30 to-purple-900/30 rounded-lg flex items-center justify-center mb-2">
-                                    <div className="text-center">
-                                        <Camera className="w-6 h-6 text-white/50 mx-auto mb-1" />
-                                        <p className="text-white/70 text-xs">
-                                            NASA APOD Loading...
-                                        </p>
+                                <div className="space-y-2 flex-1">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">
+                                            Confirmed Planets:
+                                        </span>
+                                        <span className="text-purple-400 font-semibold">
+                                            5,571+
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">
+                                            Potentially Habitable:
+                                        </span>
+                                        <span className="text-green-400 font-semibold">
+                                            64 Worlds
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">
+                                            Latest Discovery:
+                                        </span>
+                                        <span className="text-yellow-400 font-semibold">
+                                            TOI-715 b
+                                        </span>
                                     </div>
                                 </div>
-                                <p className="text-gray-400 text-xs">
-                                    Astronomy Picture of the Day
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -254,9 +272,9 @@ export default function EnhancedDashboard() {
                         <RealNEOTracker />
                     </div>
                 )}
-                {activeSection === "apod" && (
+                {activeSection === "iss" && (
                     <div className="h-full overflow-hidden">
-                        <RealAPOD />
+                        <ISSTracker />
                     </div>
                 )}
                 {activeSection === "mars" && (
@@ -264,9 +282,9 @@ export default function EnhancedDashboard() {
                         <SimpleMarsWeather />
                     </div>
                 )}
-                {activeSection === "earth" && (
+                {activeSection === "exoplanets" && (
                     <div className="h-full overflow-hidden">
-                        <RealEarthImagery />
+                        <ExoplanetDiscovery />
                     </div>
                 )}
                 {activeSection === "solar" && (
