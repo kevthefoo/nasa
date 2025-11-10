@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# vscode
+.vscode/
+
 # to-do
 z.txt
 z.json
