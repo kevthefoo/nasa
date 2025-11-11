@@ -18,6 +18,8 @@ import MarsWeather from "./MarsWeather";
 import SolarFlareMonitor from "./SolarFlareMonitor";
 import AstronomicalEvents from "./AstronomicalEvents";
 
+import EclipseTracker from "./EclipseTracker";
+
 export default function Dashboard() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [activeSection, setActiveSection] = useState("overview");
@@ -54,6 +56,7 @@ export default function Dashboard() {
         { id: "mars", label: "Mars Weather", icon: Sun },
         { id: "asteroids", label: "Asteroid Watch", icon: AlertTriangle },
         { id: "events", label: "Celestial Events", icon: Calendar },
+        { id: "eclipses", label: "Eclipse Tracker", icon: Globe },
     ];
 
     return (
@@ -162,66 +165,32 @@ export default function Dashboard() {
                         <div className="grid grid-cols-3 gap-3 flex-1 overflow-hidden">
                             <div className="bg-black/40 backdrop-blur-md rounded-lg p-4 border border-white/20 h-full flex flex-col">
                                 <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                                    <Satellite className="w-5 h-5 text-blue-400" />
-                                    ISS Live Tracker
+                                    <Globe className="w-5 h-5 text-purple-400" />
+                                    Eclipse Tracker
                                 </h3>
                                 <div className="space-y-2 flex-1">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-400">
-                                            Current Crew:
-                                        </span>
-                                        <span className="text-blue-400 font-semibold">
-                                            7 Astronauts
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">
-                                            Orbital Speed:
-                                        </span>
-                                        <span className="text-green-400 font-semibold">
-                                            27,600 km/h
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">
-                                            Status:
-                                        </span>
-                                        <span className="text-green-400 font-semibold flex items-center gap-1">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            Live Tracking
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-black/40 backdrop-blur-md rounded-lg p-4 border border-white/20 h-full flex flex-col">
-                                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                                    <Telescope className="w-5 h-5 text-purple-400" />
-                                    Exoplanet Discoveries
-                                </h3>
-                                <div className="space-y-2 flex-1">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">
-                                            Confirmed Planets:
+                                            Next Solar Eclipse:
                                         </span>
                                         <span className="text-purple-400 font-semibold">
-                                            5,571+
+                                            Mar 14, 2026
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-400">
-                                            Potentially Habitable:
-                                        </span>
-                                        <span className="text-green-400 font-semibold">
-                                            64 Worlds
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">
-                                            Latest Discovery:
+                                            Next Lunar Eclipse:
                                         </span>
                                         <span className="text-yellow-400 font-semibold">
-                                            TOI-715 b
+                                            Sep 7, 2025
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">
+                                            Visibility:
+                                        </span>
+                                        <span className="text-orange-400 font-semibold">
+                                            Regional
                                         </span>
                                     </div>
                                 </div>
@@ -284,6 +253,12 @@ export default function Dashboard() {
                 {activeSection === "events" && (
                     <div className="h-full overflow-hidden">
                         <AstronomicalEvents />
+                    </div>
+                )}
+
+                {activeSection === "eclipses" && (
+                    <div className="h-full overflow-hidden">
+                        <EclipseTracker />
                     </div>
                 )}
             </div>
